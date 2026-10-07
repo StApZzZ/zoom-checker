@@ -1,0 +1,55 @@
+[Unit]
+Description=Zoom Checker — учёт посещаемости Zoom-занятий
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zoom-checker
+Group=zoom-checker
+# The service reads its settings file itself (--config), with the same parser
+# as `zoom-checker check-config`, which install.sh runs before every restart.
+# systemd's EnvironmentFile= has other rules (no inline "# comments", other
+# quoting), so a file it accepted could still fail here, or the reverse.
+Environment=DATA_DIR=/var/lib/zoom-checker
+ExecStart=/usr/local/bin/zoom-checker --config /etc/zoom-checker/zoom-checker.env serve
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=20
+
+# Bind 80/443 without running as root.
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+
+# Hardening.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+ProtectProc=invisible
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+RemoveIPC=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+SystemCallErrorNumber=EPERM
+StateDirectory=zoom-checker
+StateDirectoryMode=0750
+ReadWritePaths=/var/lib/zoom-checker
+UMask=0027
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

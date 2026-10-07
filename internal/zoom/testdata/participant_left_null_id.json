@@ -1,0 +1,30 @@
+{
+  "event": "meeting.participant_left",
+  "event_ts": 1791280212604,
+  "payload": {
+    "account_id": "Xq3vKc9mT0yLw2BnR5aZpQ",
+    "object": {
+      "id": null,
+      "uuid": "qLa3t1fZTxe0n8Yw6Vb+5g==",
+      "host_id": "z8yCxAbCDEfg23HiJKl4mN",
+      "topic": null,
+      "type": 0,
+      "start_time": "2026-10-06T09:20:00Z",
+      "timezone": "",
+      "duration": 0,
+      "participant": {
+        "user_id": "16780288",
+        "user_name": "Сидорова Анна",
+        "id": "",
+        "participant_uuid": "",
+        "leave_time": "2026-10-06T09:50:12Z",
+        "leave_reason": "left the meeting. Reason : left the meeting with Unknown Failover Reason",
+        "email": "",
+        "registrant_id": "",
+        "participant_user_id": "",
+        "public_ip": "203.0.113.90",
+        "private_ip": "10.0.0.7"
+      }
+    }
+  }
+}

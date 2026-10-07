@@ -1,0 +1,101 @@
+{
+  "realm": "edu",
+  "displayName": "Zoom Checker test realm",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "roles": {
+    "realm": [
+      { "name": "zoom-checker-admin", "description": "Zoom Checker administrator" },
+      { "name": "zoom-checker-teacher", "description": "Zoom Checker teacher" }
+    ]
+  },
+  "groups": [
+    {
+      "name": "staff",
+      "path": "/staff",
+      "subGroups": [
+        { "name": "zoom-teachers", "path": "/staff/zoom-teachers", "realmRoles": ["zoom-checker-teacher"] }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "zoom-checker",
+      "name": "Zoom Checker",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${ZC_OIDC_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "rootUrl": "http://localhost:8080",
+      "baseUrl": "/",
+      "redirectUris": [
+        "http://localhost:8080/auth/oidc/callback",
+        "http://127.0.0.1:8080/auth/oidc/callback"
+      ],
+      "webOrigins": ["+"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:8080/login##http://127.0.0.1:8080/login"
+      },
+      "defaultClientScopes": ["web-origins", "acr", "profile", "roles", "basic", "email"],
+      "optionalClientScopes": ["address", "phone", "offline_access", "organization", "microprofile-jwt"],
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "groups",
+            "full.path": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "kc-admin",
+      "enabled": true,
+      "email": "kc-admin@example.test",
+      "emailVerified": true,
+      "firstName": "Анна",
+      "lastName": "Админова",
+      "credentials": [{ "type": "password", "value": "KcAdmin-Passw0rd!", "temporary": false }],
+      "realmRoles": ["default-roles-edu", "zoom-checker-admin"]
+    },
+    {
+      "username": "kc-teacher",
+      "enabled": true,
+      "email": "kc-teacher@example.test",
+      "emailVerified": true,
+      "firstName": "Ольга",
+      "lastName": "Преподаватель",
+      "credentials": [{ "type": "password", "value": "KcTeacher-Passw0rd!", "temporary": false }],
+      "realmRoles": ["default-roles-edu"],
+      "groups": ["/staff/zoom-teachers"]
+    },
+    {
+      "username": "kc-student",
+      "enabled": true,
+      "email": "kc-student@example.test",
+      "emailVerified": true,
+      "firstName": "Иван",
+      "lastName": "Студентов",
+      "credentials": [{ "type": "password", "value": "KcStudent-Passw0rd!", "temporary": false }],
+      "realmRoles": ["default-roles-edu"]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+# build output
+/dist/
+/bin/
+/zoom-checker
+web/dist/*
+!web/dist/.gitkeep
+web/node_modules/
+web/test-results/
+web/playwright-report/
+web/blob-report/
+web/.vite/
+
+# runtime data
+/data/
+*.pid
+*.db
+*.db-shm
+*.db-wal
+.env
+!deploy/.env.example
+
+# editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store

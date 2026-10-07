@@ -1,0 +1,65 @@
+# Seed data for the internal/auth integration tests (vegardit/openldap).
+# ${LDAP_INIT_ORG_DN} is substituted by the image (dc=example,dc=test).
+# Passwords (pre-hashed as {SSHA}):
+#   zc-svc   Svc-Passw0rd!       service account used for searches
+#   teacher1 Teacher1-Passw0rd!  member of zoom-checker-teachers
+#   admin1   Admin1-Passw0rd!    member of zoom-checker-admins
+#   student1 Student1-Passw0rd!  no Zoom Checker group (access denied)
+# Note: the image's "unique" overlay requires cn to be unique in the tree.
+
+dn: uid=zc-svc,ou=TechnicalAccounts,ou=Users,${LDAP_INIT_ORG_DN}
+objectClass: inetOrgPerson
+uid: zc-svc
+cn: Zoom Checker Service
+sn: Service
+userPassword: {SSHA}feNGMSMSRc3lKMk+utWLc4Vc3wR6Y3N2YzAwMQ==
+
+# cn: Мария Иванова
+dn: uid=teacher1,ou=Internal,ou=Users,${LDAP_INIT_ORG_DN}
+objectClass: inetOrgPerson
+uid: teacher1
+cn:: 0JzQsNGA0LjRjyDQmNCy0LDQvdC+0LLQsA==
+givenName:: 0JzQsNGA0LjRjw==
+sn:: 0JjQstCw0L3QvtCy0LA=
+mail: teacher1@example.test
+userPassword: {SSHA}85nKliZAsu/wy0xU1qBQw8PxrMZ6Y3RlYWNoMQ==
+
+# cn: Пётр Админов
+dn: uid=admin1,ou=Internal,ou=Users,${LDAP_INIT_ORG_DN}
+objectClass: inetOrgPerson
+uid: admin1
+cn:: 0J/RkdGC0YAg0JDQtNC80LjQvdC+0LI=
+givenName:: 0J/RkdGC0YA=
+sn:: 0JDQtNC80LjQvdC+0LI=
+mail: admin1@example.test
+userPassword: {SSHA}0CoSlD/GmJV0zw2aiLrLbQUWRFx6Y2FkbWluMQ==
+
+# cn: Семён Студентов
+dn: uid=student1,ou=Internal,ou=Users,${LDAP_INIT_ORG_DN}
+objectClass: inetOrgPerson
+uid: student1
+cn:: 0KHQtdC80ZHQvSDQodGC0YPQtNC10L3RgtC+0LI=
+givenName:: 0KHQtdC80ZHQvQ==
+sn:: 0KHRgtGD0LTQtdC90YLQvtCy
+mail: student1@example.test
+userPassword: {SSHA}7v/OXLY4ZbqmxPTzkoSS36XU+5N6Y3N0dWQwMQ==
+
+# groupOfNames: the image's memberOf overlay ignores these, so the group
+# search (member=<dn>) is what finds them.
+dn: cn=zoom-checker-teachers,ou=Groups,${LDAP_INIT_ORG_DN}
+objectClass: groupOfNames
+cn: zoom-checker-teachers
+member: uid=teacher1,ou=Internal,ou=Users,${LDAP_INIT_ORG_DN}
+
+dn: cn=zoom-checker-admins,ou=Groups,${LDAP_INIT_ORG_DN}
+objectClass: groupOfNames
+cn: zoom-checker-admins
+member: uid=admin1,ou=Internal,ou=Users,${LDAP_INIT_ORG_DN}
+
+# groupOfUniqueNames: populates memberOf on the users.
+dn: cn=zc-all-staff,ou=Groups,${LDAP_INIT_ORG_DN}
+objectClass: groupOfUniqueNames
+cn: zc-all-staff
+uniqueMember: uid=teacher1,ou=Internal,ou=Users,${LDAP_INIT_ORG_DN}
+uniqueMember: uid=admin1,ou=Internal,ou=Users,${LDAP_INIT_ORG_DN}
+uniqueMember: uid=student1,ou=Internal,ou=Users,${LDAP_INIT_ORG_DN}

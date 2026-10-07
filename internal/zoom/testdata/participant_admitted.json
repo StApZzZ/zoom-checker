@@ -1,0 +1,28 @@
+{
+  "event": "meeting.participant_admitted",
+  "event_ts": 1791277180466,
+  "payload": {
+    "account_id": "Xq3vKc9mT0yLw2BnR5aZpQ",
+    "operator": "teacher@school.example",
+    "operator_id": "z8yCxAbCDEfg23HiJKl4mN",
+    "operation": "single",
+    "object": {
+      "id": "85746065432",
+      "uuid": "/kV8nE2xQ+O0hR3dWm1x9A==",
+      "host_id": "z8yCxAbCDEfg23HiJKl4mN",
+      "topic": "Математика — 10А",
+      "type": 8,
+      "start_time": "2026-10-06T09:00:03Z",
+      "timezone": "Europe/Moscow",
+      "duration": 90,
+      "participant": {
+        "user_id": "16777216",
+        "user_name": "Петров Пётр",
+        "id": "",
+        "participant_uuid": "8F3C2B1A-7D6E-4F5A-9B8C-0D1E2F3A4B5C",
+        "date_time": "2026-10-06T08:59:40Z",
+        "email": ""
+      }
+    }
+  }
+}

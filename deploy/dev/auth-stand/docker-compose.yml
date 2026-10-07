@@ -1,0 +1,69 @@
+# Identity providers for the internal/auth integration tests and for trying
+# LDAP / Keycloak login locally. Start with ./stand.sh up (it waits for health
+# and finishes the Samba setup), print test variables with ./stand.sh env,
+# remove everything with ./stand.sh down. Host ports avoid 8080 (the app).
+# Ports are published on 127.0.0.1 only: the stand uses well-known admin
+# passwords (Keycloak admin/admin, Samba Administrator, OpenLDAP root) and a
+# privileged Samba DC, which must never be reachable from the network.
+name: zc-test-auth
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.0
+    container_name: zc-test-keycloak
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      # Fixed public URL: the issuer is http://localhost:18080/realms/edu for
+      # the browser and the app alike (no IssuerMismatchError).
+      KC_HOSTNAME: http://localhost:18080
+      # Substituted into ${ZC_OIDC_CLIENT_SECRET} in edu-realm.json on import.
+      ZC_OIDC_CLIENT_SECRET: ${ZC_OIDC_CLIENT_SECRET:-zc-dev-oidc-secret}
+    ports:
+      - "127.0.0.1:18080:8080"
+      - "127.0.0.1:19000:9000" # management: /health/ready
+    volumes:
+      - ./keycloak/edu-realm.json:/opt/keycloak/data/import/edu-realm.json:ro
+    healthcheck:
+      # The image has no curl; talk HTTP over bash's /dev/tcp.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+  openldap:
+    image: vegardit/openldap:2.6.10
+    container_name: zc-test-openldap
+    environment:
+      LDAP_INIT_ORG_DN: dc=example,dc=test
+      LDAP_INIT_ROOT_USER_PW: Root-Passw0rd!
+      LDAP_INIT_PASSWORD_HASH: SSHA
+    ports:
+      - "127.0.0.1:13890:389"
+    volumes:
+      - ./openldap/10-zoom-checker.ldif:/opt/ldifs/custom/10-zoom-checker.ldif:ro
+    healthcheck:
+      test: ["CMD-SHELL", "ldapsearch -x -H ldap://127.0.0.1:389 -D uid=zc-svc,ou=TechnicalAccounts,ou=Users,dc=example,dc=test -w 'Svc-Passw0rd!' -b dc=example,dc=test '(uid=student1)' dn | grep -q '^dn:'"]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+
+  samba:
+    # Samba AD DC (MIT KDC) configured by sambacc from samba/container.json.
+    # Needs a privileged container. Nested groups and the disabled user are
+    # set up by samba/init.sh (stand.sh runs it via docker exec).
+    image: quay.io/samba.org/samba-ad-server:v0.9
+    container_name: zc-test-samba
+    hostname: dc1
+    privileged: true
+    environment:
+      SAMBACC_CONFIG: /etc/samba/container.json
+      SAMBA_CONTAINER_ID: zc
+    ports:
+      - "127.0.0.1:13636:636" # LDAPS
+      - "127.0.0.1:13389:389" # LDAP + StartTLS
+    volumes:
+      - ./samba/container.json:/etc/samba/container.json:ro
+      - ./samba/init.sh:/zc/init.sh:ro

@@ -1,0 +1,28 @@
+{
+  "samba-container-config": "v0",
+  "configs": {
+    "zc": { "instance_features": ["addc"], "domain_settings": "corp", "instance_name": "dc1" }
+  },
+  "domain_settings": {
+    "corp": { "realm": "CORP.EXAMPLE.TEST", "short_domain": "CORP", "admin_password": "Adm1n-Passw0rd!" }
+  },
+  "organizational_units": {
+    "corp": [ { "name": "ZoomUsers" }, { "name": "ZoomGroups" } ]
+  },
+  "domain_groups": {
+    "corp": [
+      { "name": "ZoomChecker-Admins",   "ou": "ZoomGroups" },
+      { "name": "ZoomChecker-Teachers", "ou": "ZoomGroups" },
+      { "name": "helpdesk",             "ou": "ZoomGroups" }
+    ]
+  },
+  "domain_users": {
+    "corp": [
+      { "name": "t.ivanova", "password": "Ivanova-Passw0rd!", "given_name": "Татьяна", "surname": "Иванова", "ou": "ZoomUsers", "member_of": ["helpdesk"] },
+      { "name": "a.petrov",  "password": "Petrov-Passw0rd!",  "given_name": "Алексей", "surname": "Петров",  "ou": "ZoomUsers", "member_of": ["ZoomChecker-Admins"] },
+      { "name": "s.sidorov", "password": "Sidorov-Passw0rd!", "given_name": "Сергей",  "surname": "Сидоров", "ou": "ZoomUsers", "member_of": [] },
+      { "name": "carol",     "password": "Carol-Passw0rd!",   "given_name": "Carol",   "surname": "Disabled", "ou": "ZoomUsers", "member_of": ["ZoomChecker-Teachers"] },
+      { "name": "svc-zoom",  "password": "Svc-Passw0rd!",     "given_name": "Zoom",    "surname": "Service",  "member_of": [] }
+    ]
+  }
+}

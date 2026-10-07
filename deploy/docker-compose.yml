@@ -1,0 +1,69 @@
+# Zoom Checker in Docker — see README-docker.md.
+#
+#   cp .env.example .env && chmod 600 .env   # set PUBLIC_URL and ZOOM_WEBHOOK_SECRET_TOKEN
+#   docker compose run --rm zoom-checker check-config
+#   docker compose up -d --build
+#
+# With PostgreSQL instead of the built-in SQLite, add to .env:
+#   COMPOSE_PROFILES=postgres          (enables the postgres service for every compose command)
+#   POSTGRES_PASSWORD=<strong password: letters and digits only, e.g. openssl rand -hex 24>
+#   DATABASE_URL=postgres://zoom_checker:<same password>@postgres:5432/zoom_checker?sslmode=disable
+# and run the same `docker compose up -d --build`.
+name: zoom-checker
+
+services:
+  zoom-checker:
+    build:
+      context: ..
+      args:
+        VERSION: ${VERSION:-dev}
+        COMMIT: ${COMMIT:-}
+    image: zoom-checker:latest
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - zc-data:/data
+      # Files named in .env (LDAP_CA_FILE, OIDC_CA_FILE, TLS_CERT_FILE/TLS_KEY_FILE):
+      # put them in deploy/certs (owner 65532), uncomment the line below and use
+      # /certs/... paths in .env (admin-guide §4).
+      # - ./certs:/certs:ro
+    ports:
+      # TLS_MODE=auto (built-in Let's Encrypt, also for a bare IP address): 80 and 443.
+      - "80:80"
+      - "443:443"
+      # TLS_MODE=off behind your own reverse proxy (nginx, Caddy, balancer):
+      # replace the two lines above with
+      # - "127.0.0.1:8080:8080"
+      # and set TRUSTED_PROXIES in .env.
+    sysctls:
+      # The image runs as a non-root user; this lets it bind ports 80/443
+      # (Docker sets it by default, Podman does not).
+      net.ipv4.ip_unprivileged_port_start: "0"
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: false
+    restart: unless-stopped
+    stop_grace_period: 20s
+
+  postgres:
+    image: postgres:18-alpine
+    profiles: ["postgres"]
+    environment:
+      POSTGRES_DB: zoom_checker
+      POSTGRES_USER: zoom_checker
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+    volumes:
+      # PostgreSQL 18 images keep their data under /var/lib/postgresql/18/docker.
+      - zc-pg:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zoom_checker -d zoom_checker"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+volumes:
+  zc-data:
+  zc-pg:

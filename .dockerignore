@@ -1,0 +1,22 @@
+# Keep the build context small and free of local state / secrets.
+.git
+.gitignore
+.idea
+.vscode
+**/node_modules
+web/dist
+web/test-results
+web/playwright-report
+web/blob-report
+web/.vite
+dist
+bin
+data
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/.env
+deploy/dev
+deploy/test
+Dockerfile
+.dockerignore

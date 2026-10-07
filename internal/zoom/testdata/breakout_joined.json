@@ -1,0 +1,32 @@
+{
+  "event": "meeting.participant_joined_breakout_room",
+  "event_ts": 1791278400218,
+  "payload": {
+    "account_id": "Xq3vKc9mT0yLw2BnR5aZpQ",
+    "object": {
+      "id": "85746065432",
+      "uuid": "/kV8nE2xQ+O0hR3dWm1x9A==",
+      "breakout_room_uuid": "FkQbpP2UR028mDrwzEahqw==",
+      "host_id": "z8yCxAbCDEfg23HiJKl4mN",
+      "topic": "Математика — 10А",
+      "type": 8,
+      "start_time": "2026-10-06T09:00:03Z",
+      "timezone": "Europe/Moscow",
+      "duration": 90,
+      "participant": {
+        "user_id": "16780288",
+        "parent_user_id": "16778240",
+        "user_name": "Иванов  Иван",
+        "id": "",
+        "participant_uuid": "D2FF531A-1CEE-C0E7-EB63-A05B8F09F41C",
+        "join_time": "2026-10-06T09:20:00Z",
+        "email": "",
+        "registrant_id": "",
+        "participant_user_id": "",
+        "phone_number": "",
+        "customer_key": "",
+        "public_ip": "203.0.113.17"
+      }
+    }
+  }
+}
